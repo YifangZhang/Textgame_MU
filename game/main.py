@@ -13,15 +13,17 @@ Due to the title of the game, I will try to recreate the Flash Browser game of M
 5、升级：法师+1血，弓箭手+2血，战士+3血
 '''
 
+### all the imports ###
+import json
+
 player = {
-    "name": "Player",
-    "class": "warrior",
-    "level": 1,
-    "exp": 0,
-    "gold": 10000,
-    "skills": {},
-    "location": "forest",
-    "monster": "goblin",
+    "basics":{
+        "name": "Player",
+        "class": "warrior",    
+        "skills": {},
+        "location": "forest",
+        "monster": "goblin"
+    },
     "gems":
     {   
         "life_gem": 0,
@@ -29,6 +31,7 @@ player = {
         "spirit_gem": 0,
         "maya_gem": 0,
         "feather_gem": 0,
+        "gold": 10000,
         "hp_pot": 100
     },
     "equipments":
@@ -42,18 +45,39 @@ player = {
         "gloves": {"name": "empty", "stats":[0,0,0]},
         "wings": {"name": "empty", "stats":[0,0,0]}
     },
-    "str": 27,
-    "dex": 20,
-    "vit": 20,
-    "int": 15,
-    "cur_hp": 102
+    "stats": {
+        "level": 1,
+        "exp": 0,
+        "str": 27,
+        "dex": 20,
+        "vit": 20,
+        "int": 15,
+        "cur_hp": 102
+    }
+    
 }
 
 ### step 1: player name, player class, or load ###
 
 ## TODO: game intro text
+intro_text = "<saved for future intro text block>"
 
 ## TODO: save and load system
+def save_character():
+    pn = player['name']
+    with open(pn + ".json", "w") as outfile:
+        json.dump(player, outfile)
+    return None
+
+def load_character(pn):
+    load_player = player
+    try: 
+        with open(pn + ".json", "r") as outfile:
+            load_player = json.load(outfile)
+            print("player " + pn + " is loaded")
+    except Exception as e:
+        print("there is no such player as %s" % pn)
+    return load_player
 
 ### step 2: player entered the main screen:
 ## TODO: basic player info
@@ -103,4 +127,28 @@ player = {
 '''
 
 
+## testing ground ##
+game = True
+while (game == True):
 
+    print("--------------------------")
+
+    option = str(input("player input: ")).strip()
+
+    if(option == "save"):
+        save_character()
+    elif("load" in option):
+        pn = option.split(" ")[1]
+        load_character(pn)
+    elif(option == "exit"):
+        game = False
+    elif("show" in option):
+        wts = option.split(" ")[1]
+        try:
+            print(player[wts])
+        except Exception as e:
+            print("no such field for player")
+    
+
+## end of while & testing ##
+    
