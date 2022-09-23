@@ -3,8 +3,10 @@ Due to the title of the game, I will try to recreate the Flash Browser game of M
 1. warrior: 27 str, 20 dex, 20 vit, 15 int
 2. mage: 18 str, 18 dex, 15 vit, 30 int
 3. archer: 22 str, 25 dex, 20 vit, 15 int
-4. calculated hp 60+level*2+vit*2 warrior 
-   60+level*1+vit*1 mage, 60+level*2+vit*1
+4. calculated hp 
+    110+level*2+vit*2 warrior 
+    60+level*1+vit*1 mage
+    80+level*2+vit*1 archer
 5. notes:
 1、智力：法师+1攻击力
 2、体力：法师+1生命，战士+2生命，弓箭手+1生命
@@ -17,8 +19,9 @@ Due to the title of the game, I will try to recreate the Flash Browser game of M
 import json
 
 player = {
-    "basics":{
-        "name": "Player",
+    "basics":
+    {
+        "name": "",
         "class": "warrior",    
         "skills": {},
         "location": "forest",
@@ -45,14 +48,15 @@ player = {
         "gloves": {"name": "empty", "stats":[0,0,0]},
         "wings": {"name": "empty", "stats":[0,0,0]}
     },
-    "stats": {
+    "stats": 
+    {
         "level": 1,
         "exp": 0,
         "str": 27,
         "dex": 20,
         "vit": 20,
         "int": 15,
-        "cur_hp": 102
+        "cur_hp": 162
     }
     
 }
@@ -62,9 +66,114 @@ player = {
 ## TODO: game intro text
 intro_text = "<saved for future intro text block>"
 
-## TODO: save and load system
+## create a new character
+def create_new_player(pn, pc):
+
+    blank_basics = {
+        "name": "",
+        "class": "warrior",    
+        "skills": {},
+        "location": "forest",
+        "monster": "goblin"
+    }
+    blank_gems = {   
+        "life_gem": 0,
+        "blessing_gem": 0,
+        "spirit_gem": 0,
+        "maya_gem": 0,
+        "feather_gem": 0,
+        "gold": 10000,
+        "hp_pot": 100
+    }
+    blank_equipments = {
+        "head": {"name": "empty", "stats":[0,0,0]},
+        "chest": {"name": "empty", "stats":[0,0,0]},
+        "main": {"name": "empty", "stats":[0,0,0]},
+        "off": {"name": "empty", "stats":[0,0,0]},
+        "pants": {"name": "empty", "stats":[0,0,0]},
+        "shoes": {"name": "empty", "stats":[0,0,0]},
+        "gloves": {"name": "empty", "stats":[0,0,0]},
+        "wings": {"name": "empty", "stats":[0,0,0]}
+    }
+
+    cur_player = {
+        "basics": blank_basics,
+        "gems": blank_gems,
+        "equipments": blank_equipments,
+        "stats": {
+            "level": 1,
+            "exp": 0,
+            "str": 28,
+            "dex": 20,
+            "vit": 25,
+            "int": 10,
+            "cur_hp": 162
+        }
+    }
+
+    if(pn == ""):
+        return cur_player
+
+    if(pc == "warrior"):
+        cur_player = {
+            "basics": blank_basics,
+            "gems": blank_gems,
+            "equipments": blank_equipments,
+            "stats": {
+                "level": 1,
+                "exp": 0,
+                "str": 28,
+                "dex": 20,
+                "vit": 25,
+                "int": 10,
+                "cur_hp": 162
+            }
+        }
+        cur_player['basics']['name'] = pn
+        cur_player['basics']['class'] = 'warrior'
+    elif(pc == "archer"):
+        cur_player = {
+            "basics": blank_basics,
+            "gems": blank_gems,
+            "equipments": blank_equipments,
+            "stats": {
+                "level": 1,
+                "exp": 0,
+                "str": 22,
+                "dex": 25,
+                "vit": 20,
+                "int": 15,
+                "cur_hp": 102
+            }
+        }
+        cur_player['basics']['name'] = pn
+        cur_player['basics']['class'] = 'archer'
+    elif(pc == "mage"):
+        cur_player = {
+            "basics": blank_basics,
+            "gems": blank_gems,
+            "equipments": blank_equipments,
+            "stats": {
+                "level": 1,
+                "exp": 0,
+                "str": 18,
+                "dex": 18,
+                "vit": 15,
+                "int": 30,
+                "cur_hp": 76
+            }
+        }
+        cur_player['basics']['name'] = pn
+        cur_player['basics']['class'] = 'mage'
+    else:
+        print("no such class, please create a new character again.")
+
+    return cur_player
+
+## save and load system
 def save_character():
-    pn = player['name']
+    pn = player['basics']['name']
+    ## TODO: can implement a character already exist function ##
     with open(pn + ".json", "w") as outfile:
         json.dump(player, outfile)
     return None
@@ -131,15 +240,31 @@ def load_character(pn):
 game = True
 while (game == True):
 
+    while((player['basics']['name'] == "") and (game == True)):
+
+        print("please load/create a character before join the game.")
+        print("use 'create <name> <class>' or 'load <name>'.")
+        option = str(input("player input: ")).strip()
+
+        if("load" in option):
+            pn = option.split(" ")[1]
+            player = load_character(pn)
+        elif("create" in option):
+            player_name = option.split(" ")[1]
+            player_class = option.split(" ")[2]
+            player = create_new_player(player_name, player_class)
+        elif(option == "exit"):
+            game = False
+        else:
+            print("unknown command, please re-enter")
+
     print("--------------------------")
-
     option = str(input("player input: ")).strip()
-
     if(option == "save"):
         save_character()
     elif("load" in option):
         pn = option.split(" ")[1]
-        load_character(pn)
+        player = load_character(pn)
     elif(option == "exit"):
         game = False
     elif("show" in option):
@@ -148,6 +273,8 @@ while (game == True):
             print(player[wts])
         except Exception as e:
             print("no such field for player")
+    else:
+        print("unknown command, please re-enter")
     
 
 ## end of while & testing ##
