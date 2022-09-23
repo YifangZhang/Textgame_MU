@@ -17,6 +17,7 @@ Due to the title of the game, I will try to recreate the Flash Browser game of M
 
 ### all the imports ###
 import json
+import math
 
 player = {
     "basics":
@@ -112,6 +113,7 @@ def create_new_player(pn, pc):
     }
 
     if(pn == ""):
+        print("new character cannot be empty on name")
         return cur_player
 
     if(pc == "warrior"):
@@ -168,6 +170,7 @@ def create_new_player(pn, pc):
     else:
         print("no such class, please create a new character again.")
 
+    print("character " + pn + " has been successfully created!")
     return cur_player
 
 ## save and load system
@@ -189,7 +192,7 @@ def load_character(pn):
     return load_player
 
 ### step 2: player entered the main screen:
-## TODO: basic player info
+##  basic player info
 '''
 1. name, class, level
 2. current exp, needed exp (lvl^3+lvl*10+100), gold
@@ -198,6 +201,48 @@ def load_character(pn):
 5. all those freaking gems: life, blessing, spirit, maya, feather, hppot
 6. all equipments: head, chest, main, off, pants, gloves, shoes, wings
 '''
+
+def get_exp(cur_player):
+    lvl = cur_player['stats']['level']
+    exp_need = pow(lvl, 3) + lvl*10 + 100
+    return exp_need
+
+def get_atk(cur_player):
+    if(cur_player['basics']['class'] == "warrior"):
+        cur_atk = math.floor(cur_player['stats']['str'] * 0.5)
+    elif(cur_player['basics']['class'] == "archer"):
+        cur_atk = math.floor(cur_player['stats']['str'] * 0.75)
+    elif(cur_player['basics']['class'] == "mage"):
+        cur_atk = math.floor(cur_player['stats']['int'] * 1)
+    else:
+        print("something went wrong on this character class")
+        raise KeyError("current class string: " + cur_player['basics']['class'])
+    return cur_atk    
+
+def get_def(cur_player):
+    if(cur_player['basics']['class'] == "warrior"):
+        cur_def = math.floor(cur_player['stats']['dex'] * 1)
+    elif(cur_player['basics']['class'] == "archer"):
+        cur_def = math.floor(cur_player['stats']['dex'] * 1)
+    elif(cur_player['basics']['class'] == "mage"):
+        cur_def = math.floor(cur_player['stats']['dex'] * 0.75)
+    else:
+        print("something went wrong on this character class")
+        raise KeyError("current class string: " + cur_player['basics']['class'])
+    return cur_def 
+
+def get_hp(cur_player):
+    if(cur_player['basics']['class'] == "warrior"):
+        cur_hp = math.floor(cur_player['stats']['vit'] * 2 + cur_player['stats']['level']*2 + 110)
+    elif(cur_player['basics']['class'] == "archer"):
+        cur_hp = math.floor(cur_player['stats']['vit'] * 1 + cur_player['stats']['level']*2 + 80)
+    elif(cur_player['basics']['class'] == "mage"):
+        cur_hp = math.floor(cur_player['stats']['vit'] * 1 + cur_player['stats']['level']*1 + 60)
+    else:
+        print("something went wrong on this character class")
+        raise KeyError("current class string: " + cur_player['basics']['class'])
+    return cur_hp 
+    
 
 ## TODO: basic combat option
 '''
@@ -209,7 +254,13 @@ def load_character(pn):
 5. 
 '''
 
-## TODO: basic stats boosting system
+## TODO: choose monster and change location
+'''
+1. monster+location list in json
+2. going to work on demodel all monsters
+'''
+
+## TODO: basic stats allocation system
 '''
 1. adding stats will affect the atk, def, and hp
 2. skills implementation?
@@ -227,12 +278,7 @@ def load_character(pn):
 '''
 1. buying gems
 2. buying pots
-'''
-
-## TODO: choose monster and change location
-'''
-1. monster+location list in json
-2. going to work on demodel all monsters
+3. sell stuff
 '''
 
 
@@ -265,14 +311,30 @@ while (game == True):
     elif("load" in option):
         pn = option.split(" ")[1]
         player = load_character(pn)
+    elif("create" in option):
+        player_name = option.split(" ")[1]
+        player_class = option.split(" ")[2]
+        player = create_new_player(player_name, player_class)
     elif(option == "exit"):
         game = False
     elif("show" in option):
         wts = option.split(" ")[1]
-        try:
-            print(player[wts])
-        except Exception as e:
-            print("no such field for player")
+        if(wts == "combat"):
+            combat = {
+                "atk": get_atk(player),
+                "def": get_def(player),
+                "hp": get_hp(player),
+                "exp_needed": get_exp(player)
+            }
+            print(combat)
+        else:
+            try:
+                print(player[wts])
+            except Exception as e:
+                print("no such field for player")
+    elif(option == "help"):
+        ## TODO: adding the help text later 
+        print("")
     else:
         print("unknown command, please re-enter")
     
