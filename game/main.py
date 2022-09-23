@@ -333,6 +333,7 @@ while (game == True):
             except Exception as e:
                 print("no such field for player")
     elif(option == "help"):
+        ## TODO: adding the help text later 
         print("")
     else:
         print("unknown command, please re-enter")
